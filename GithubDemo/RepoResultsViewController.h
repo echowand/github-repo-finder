@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "RepoTableViewCell.h"
 #import "UIImageView+AFNetworking.h"
+#import "SettingsViewController.h"
 
-@interface RepoResultsViewController : UIViewController <UISearchBarDelegate, UITableViewDataSource>
+@interface RepoResultsViewController : UIViewController <UISearchBarDelegate, UITableViewDataSource, SettingsViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *repoTableView;
 
 @end

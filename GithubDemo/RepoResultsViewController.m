@@ -10,6 +10,7 @@
 #import "MBProgressHUD.h"
 #import "GithubRepo.h"
 #import "GithubRepoSearchSettings.h"
+#import "SettingsViewController.h"
 
 @interface RepoResultsViewController ()
 @property (nonatomic, strong) UISearchBar *searchBar;
@@ -44,6 +45,9 @@
     [cell.repoName setText: repo.name];
     [cell.repoOwner setText: repo.ownerHandle];
     [cell.repoText setText: repo.repoDescription];
+    [cell.repoStars setText:[NSString stringWithFormat:@"%zd", repo.stars]];
+    [cell.repoForks setText:[NSString stringWithFormat:@"%zd", repo.forks]];
+    
     return cell;
 }
 
@@ -58,15 +62,15 @@
         self.repos = repos;
         for (GithubRepo *repo in repos) {
             
-            NSLog(@"%@", [NSString stringWithFormat:
-                   @"Name:%@\n\tStars:%ld\n\tForks:%ld,Owner:%@\n\tAvatar:%@\n\tDescription:%@\n\t",
-                          repo.name,
-                          repo.stars,
-                          repo.forks,
-                          repo.ownerHandle,
-                          repo.ownerAvatarURL,
-                          repo.repoDescription
-                   ]);
+//            NSLog(@"%@", [NSString stringWithFormat:
+//                   @"Name:%@\n\tStars:%ld\n\tForks:%ld,Owner:%@\n\tAvatar:%@\n\tDescription:%@\n\t",
+//                          repo.name,
+//                          repo.stars,
+//                          repo.forks,
+//                          repo.ownerHandle,
+//                          repo.ownerAvatarURL,
+//                          repo.repoDescription
+//                   ]);
             
         }
         [self.repoTableView reloadData];
@@ -91,18 +95,46 @@
 
 - (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {
     self.searchSettings.searchString = searchBar.text;
+    //NSLog(@"---------- %zd", [self.magicNumber integerValue]);
+    //self.searchSettings.minStars = [self.magicNumber integerValue];
     [searchBar resignFirstResponder];
     [self doSearch];
 }
 
-/*
-#pragma mark - Navigation
+- (void)onDone:(NSInteger)result
+{
+    //NSLog(@"result from SettingsViewController %zd", result);
+    //NSLog(@"result from SettingsViewController %zd", self.minStar);
+    self.searchSettings.minStars = result;
+    NSLog(@" result from settings: ---------- %zd", self.searchSettings.minStars);
+    [self doNewSearch:result];
+    [self.repoTableView reloadData];
+}
+
+- (void)doNewSearch: (NSInteger) threshold
+{
+ 
+    NSMutableArray *arrayThatYouCanRemoveObjects = [NSMutableArray arrayWithArray:self.repos];
+    
+    for (GithubRepo *repo in self.repos) {
+        if(repo.stars < threshold){
+            continue;
+        }else{
+            [arrayThatYouCanRemoveObjects removeObject: repo];
+        }
+    }
+    self.repos = [NSArray arrayWithArray:arrayThatYouCanRemoveObjects];
+
+}
+
+//#pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    SettingsViewController* settings = [segue destinationViewController];
+    settings.values = nil;
+    settings.delegate = self;
 }
-*/
 
 @end
